@@ -1,0 +1,14 @@
+-- Crear la base de datos si no existe
+CREATE DATABASE IF NOT EXISTS login;
+USE login;
+
+-- Crear la tabla usuarios
+CREATE TABLE IF NOT EXISTS usuarios (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    correo VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    rol ENUM('admin', 'usuario', 'superusuario') NOT NULL DEFAULT 'usuario', -- Agregar la columna rol con valores permitidos
+    codigo_verificacion VARCHAR(255) DEFAULT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
