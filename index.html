@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login y Registro</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <style>
+        body {
+            background: linear-gradient(to bottom right, #397bdf, #25f8ff);
+            height: 100vh;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .logo {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 100px;
+            height: 100px;
+            background-color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .logo img {
+            max-width: 100px;
+            max-height: 100px;
+        }
+        .card {
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .nav-tabs .nav-link {
+            color: #007bff;
+            font-weight: bold;
+        }
+        .nav-tabs .nav-link.active {
+            color: white;
+            background-color: #0094d2;
+            border-color: #0094d2;
+        }
+        .form-control {
+            border: 2px solid #007bff;
+            border-radius: 5px;
+        }
+        .form-control:focus {
+            border-color: #0056b3;
+            box-shadow: 0 0 5px rgba(0, 86, 179, 0.5);
+        }
+        .btn-primary {
+            background-color: #0094d2;
+            border-color: #007bff;
+        }
+        .btn-primary:hover {
+            background-color: #007bb5;
+            border-color: #005f87;
+        }
+    </style>
+</head>
+<body>
+    <div class="logo">
+        <img src="wit.png" alt="Logo">
+    </div>
+    <div class="container d-flex justify-content-center align-items-center vh-100">
+        <div class="card p-4 shadow" style="width: 400px;">
+            <ul class="nav nav-tabs mb-3" id="myTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="login-tab" data-bs-toggle="tab" data-bs-target="#login" type="button" role="tab">Login</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="register-tab" data-bs-toggle="tab" data-bs-target="#register" type="button" role="tab">Registro</button>
+                </li>
+            </ul>
+            <div class="tab-content" id="myTabContent">
+                <div class="tab-pane fade show active" id="login" role="tabpanel">
+                    <h3 class="text-center">Login</h3>
+                    <form id="loginForm">
+                        <div class="mb-3">
+                            <label for="correoLogin" class="form-label">Correo Electrónico</label>
+                            <input type="email" class="form-control" id="correoLogin" name="correo" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="passwordLogin" class="form-label">Contraseña</label>
+                            <input type="password" class="form-control" id="passwordLogin" name="password" required>
+                        </div>
+                        <div id="loginMessage" class="text-danger mb-3" style="display: none;"></div>
+                        <button type="submit" class="btn btn-primary w-100">Iniciar Sesión</button>
+                        <a href="forgot-password.html" class="btn-link mt-3 d-block text-center">¿Olvidaste tu contraseña?</a>
+                    </form>
+                </div>
+                <div class="tab-pane fade" id="register" role="tabpanel">
+                    <h3 class="text-center">Registro</h3>
+                    <form id="registerForm">
+                        <div class="mb-3">
+                            <label for="correoRegister" class="form-label">Correo Electrónico</label>
+                            <input type="email" class="form-control" id="correoRegister" name="correo" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="passwordRegister" class="form-label">Contraseña</label>
+                            <input type="password" class="form-control" id="passwordRegister" name="password" required>
+                        </div>
+                        <div id="registerMessage" class="text-danger mb-3" style="display: none;"></div>
+                        <button type="submit" class="btn btn-primary w-100">Registrarse</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+    $(document).ready(function () {
+        // Manejador del formulario de inicio de sesión
+        $('#loginForm').submit(function (e) {
+            e.preventDefault(); // Prevenir recarga de página
+            const correo = $('#correoLogin').val();
+            const password = $('#passwordLogin').val();
+
+            // Enviar los datos al servidor
+            $.post('login-token.php', { correo, password }, function (response) {
+                console.log('Respuesta del servidor:', response); // Para depuración
+
+                // Verificar si la respuesta fue exitosa
+                if (response.success) {
+                    // Redirigir según el rol
+                    window.location.href = response.redirect;
+                } else {
+                    // Mostrar mensaje de error en el formulario
+                    $('#loginMessage').text(response.message).show();
+                }
+            }, 'json').fail(function (xhr, status, error) {
+                // Manejo de errores en la solicitud AJAX
+                console.error('Error en la solicitud:', error);
+                $('#loginMessage').text('Error al procesar la solicitud. Inténtalo más tarde.').show();
+            });
+        });
+
+        // Manejador del formulario de registro
+        $('#registerForm').submit(function (e) {
+            e.preventDefault();
+            const correo = $('#correoRegister').val();
+            const password = $('#passwordRegister').val();
+
+            // Enviar los datos al servidor
+            $.post('register.php', { correo, password }, function (response) {
+                console.log('Respuesta de registro:', response); // Para depuración
+
+                // Verificar si el registro fue exitoso
+                if (response.success) {
+                    alert('Usuario registrado con éxito. Ahora puedes iniciar sesión.');
+                    $('#registerMessage').hide();
+                    $('#login-tab').click(); // Cambiar a la pestaña de inicio de sesión
+                } else {
+                    // Mostrar mensaje de error en el formulario de registro
+                    $('#registerMessage').text(response.message).show();
+                }
+            }, 'json');
+        });
+    });
+</script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
