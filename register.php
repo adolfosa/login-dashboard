@@ -25,13 +25,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
+    // Sanitizar el correo
+    $correo = filter_var($correo, FILTER_SANITIZE_EMAIL);
+
+    // Verificar si el correo es válido
+    if (!filter_var($correo, FILTER_VALIDATE_EMAIL)) {
+        echo json_encode(['success' => false, 'message' => 'El correo no tiene un formato válido. Por favor, corrige el correo e intenta nuevamente.']);
+        exit;
+    }
+
+    // Verificar que la contraseña tenga al menos 6 caracteres
+    if (strlen($password) < 6) {
+        echo json_encode(['success' => false, 'message' => 'La contraseña debe tener al menos 6 caracteres.']);
+        exit;
+    }
+
     // Verificar si el correo ya existe
     $stmt = $pdo->prepare("SELECT id FROM usuarios WHERE correo = :correo");
     $stmt->bindParam(':correo', $correo);
     $stmt->execute();
 
     if ($stmt->rowCount() > 0) {
-        echo json_encode(['success' => false, 'message' => 'El correo ya está registrado.']);
+        echo json_encode(['success' => false, 'message' => 'El correo ya está registrado. Por favor, utiliza otro correo o inicia sesión.']);
         exit;
     }
 
@@ -44,7 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->bindParam(':password', $passwordHash);
 
     if ($stmt->execute()) {
-        echo json_encode(['success' => true]);
+        echo json_encode(['success' => true, 'message' => 'Usuario registrado exitosamente.']);
     } else {
         echo json_encode(['success' => false, 'message' => 'Error al registrar el usuario.']);
     }
