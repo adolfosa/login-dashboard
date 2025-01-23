@@ -8,6 +8,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
+    // Validar longitud mínima de la nueva contraseña
+    if (strlen($nuevaContrasena) < 6) {
+        echo "<script>
+            alert('La nueva contraseña debe tener al menos 6 caracteres.');
+            window.history.back();
+        </script>";
+        exit;
+    }
+
     $host = 'localhost';
     $db = 'login';
     $user = 'root';
